@@ -19,7 +19,7 @@ export default function Modal({ isOpen, onClose, title, children, className = ""
         onClick={onClose}
       />
       <div
-        className={`relative bg-card dark:bg-card-dark rounded-2xl shadow-premium p-6 w-full max-w-md mx-auto z-10 animate-fadeIn ${className}`}
+        className={`relative bg-gradient-to-br from-white/80 to-indigo-50 dark:from-[#181B2A]/80 dark:to-[#23263A] rounded-2xl shadow-premium p-6 w-full max-w-md mx-auto z-10 animate-fadeIn ${className}`}
         onClick={e => e.stopPropagation()}
       >
         {title && <h3 className="text-xl font-bold mb-4">{title}</h3>}

@@ -4,7 +4,7 @@ import React from "react";
 export default function Card({ children, className = "", ...props }) {
   return (
     <div
-      className={`rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 bg-white text-black dark:bg-[#18181B] dark:text-white transition-all duration-300 ease-smooth ${className}`}
+      className={`rounded-2xl shadow-lg p-6 bg-gradient-to-br from-white/80 to-indigo-50 dark:from-[#181B2A]/80 dark:to-[#23263A] transition-all duration-300 ease-smooth ${className}`}
       {...props}
     >
       {children}

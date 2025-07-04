@@ -14,6 +14,20 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const CURRENCY_OPTIONS = [
+  { code: 'USD', symbol: '$', label: 'USD ($)' },
+  { code: 'INR', symbol: '₹', label: 'INR (₹)' },
+];
+
+function getDefaultCurrency() {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('currency');
+    if (saved) return saved;
+    if (navigator.language.startsWith('en-IN') || navigator.language.startsWith('hi-IN')) return 'INR';
+  }
+  return 'USD';
+}
+
 function AuthButton() {
   const { data: session, status } = useSession();
   if (status === 'loading') return null;
@@ -30,6 +44,7 @@ function AuthButton() {
 
 export default function RootLayout({ children }) {
   const [mode, setMode] = useState('light');
+  const [currency, setCurrency] = useState(getDefaultCurrency());
   useEffect(() => {
     const saved = typeof window !== 'undefined' ? localStorage.getItem('theme') : null;
     if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -40,6 +55,9 @@ export default function RootLayout({ children }) {
       document.documentElement.classList.remove('dark');
     }
   }, []);
+  useEffect(() => {
+    localStorage.setItem('currency', currency);
+  }, [currency]);
   function toggleMode() {
     const newMode = mode === 'dark' ? 'light' : 'dark';
     setMode(newMode);
@@ -50,25 +68,44 @@ export default function RootLayout({ children }) {
     }
     localStorage.setItem('theme', newMode);
   }
+  const currencyObj = CURRENCY_OPTIONS.find(c => c.code === currency) || CURRENCY_OPTIONS[0];
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#F5F7FA] dark:bg-[#101322] text-black dark:text-white min-h-screen`}>
         <SessionProvider>
-          <div className="fixed top-4 right-4 z-50 flex gap-4 items-center">
-            <AuthButton />
-            <button
-              aria-label="Toggle dark mode"
-              onClick={toggleMode}
-              className="rounded-full p-2 bg-white dark:bg-card-dark shadow-soft border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-900 transition"
-            >
-              {mode === 'dark' ? (
-                <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M17.75 15.5A6.75 6.75 0 0 1 8.5 6.25c0-.41.04-.81.1-1.2a.75.75 0 0 0-1.04-.82A9 9 0 1 0 19.77 17.44a.75.75 0 0 0-.82-1.04c-.39.06-.79.1-1.2.1Z" fill="#f59e42"/></svg>
-              ) : (
-                <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="#6366f1"/><path stroke="#6366f1" strokeWidth="2" strokeLinecap="round" d="M12 2v2m0 16v2m10-10h-2M4 12H2m15.07 6.07-1.42-1.42M6.34 6.34 4.93 4.93m12.14 0-1.41 1.41M6.34 17.66l-1.41 1.41"/></svg>
-              )}
-            </button>
-          </div>
-          <div className="w-full max-w-7xl mx-auto px-2 sm:px-6 flex flex-col min-h-screen items-center justify-center">
+          {/* Premium Navbar */}
+          <nav className="w-full z-50 sticky top-0 bg-white/70 dark:bg-[#181B2A]/80 backdrop-blur-md shadow-md border-b border-gray-100 dark:border-gray-800 flex items-center justify-between px-4 sm:px-8 h-16">
+            <div className="flex items-center gap-3">
+              <span className="text-xl font-extrabold tracking-tight bg-gradient-to-tr from-yellow-400 via-amber-500 to-yellow-700 bg-clip-text text-transparent select-none drop-shadow-sm" style={{letterSpacing: '-0.01em'}}>Expense Tracker</span>
+            </div>
+            <div className="flex items-center gap-4">
+              {/* Currency Selector */}
+              <div className="relative">
+                <select
+                  value={currency}
+                  onChange={e => setCurrency(e.target.value)}
+                  className="appearance-none pl-9 pr-6 py-2 rounded-full bg-white/80 dark:bg-[#23263A] border border-gray-200 dark:border-gray-700 shadow-md text-sm font-semibold text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-indigo-400 outline-none transition cursor-pointer hover:bg-indigo-50 dark:hover:bg-[#181B2A]"
+                  style={{ minWidth: 110 }}
+                >
+                  {CURRENCY_OPTIONS.map(opt => (
+                    <option key={opt.code} value={opt.code}>{opt.label}</option>
+                  ))}
+                </select>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-lg pointer-events-none select-none">
+                  {currencyObj.symbol === '$' ? (
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><text x="2" y="16" fontSize="16" fill="#6366f1">$</text></svg>
+                  ) : currencyObj.symbol === '₹' ? (
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><text x="2" y="16" fontSize="16" fill="#6366f1">₹</text></svg>
+                  ) : null}
+                </span>
+                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none select-none">
+                  <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </span>
+              </div>
+              <AuthButton />
+            </div>
+          </nav>
+          <div className="w-full max-w-7xl mx-auto px-2 sm:px-6 flex flex-col min-h-screen items-center justify-center pt-4">
             {children}
           </div>
         </SessionProvider>
