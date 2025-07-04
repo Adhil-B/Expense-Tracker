@@ -37,7 +37,8 @@ export default function RootLayout({ children }) {
   }
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#F5F7FA] dark:bg-[#101322] text-black dark:text-white min-h-screen`}>
+        {/* TODO: Add AuthProvider here for NextAuth or Clerk */}
         <div className="fixed top-4 right-4 z-50">
           <button
             aria-label="Toggle dark mode"
@@ -51,7 +52,9 @@ export default function RootLayout({ children }) {
             )}
           </button>
         </div>
-        {children}
+        <div className="w-full max-w-7xl mx-auto px-2 sm:px-6 flex flex-col min-h-screen items-center justify-center">
+          {children}
+        </div>
       </body>
     </html>
   );
